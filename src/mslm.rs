@@ -1,9 +1,10 @@
 use reqwest::blocking::Client as HttpClient;
 use reqwest::Error;
 use crate::{BaseClient, EmailVerifyClient};
+use once_cell::sync::Lazy;
 
+static mut DEFAULT_HTTP_CLIENT: Lazy<HttpClient> = Lazy::new(|| HttpClient::new());
 static mut DEFAULT_CLIENT: Option<Client> = None;
-static mut DEFAULT_HTTP_CLIENT: HttpClient = HttpClient::new();
 static mut DEFAULT_BASE_URL: &'static str = "https://mslm.io";
 static mut DEFAULT_USER_AGENT: &'static str = "mslm/go/1.1.2";
 static mut DEFAULT_API_KEY: &'static str = "";
@@ -23,24 +24,31 @@ impl Client {
             email_verify: EmailVerifyClient::new(api_key),
         };
         client.set_http_client(HttpClient::new());
-        client.set_base_url(DEFAULT_BASE_URL).unwrap();
-        client.set_user_agent(DEFAULT_USER_AGENT);
+        unsafe {
+            client.set_base_url(DEFAULT_BASE_URL).unwrap();
+            client.set_user_agent(DEFAULT_USER_AGENT);
+        }
+        // client.set_base_url(DEFAULT_BASE_URL).unwrap();
         client.set_api_key(api_key);
         client
     }
 
     fn init_defaults() -> Self {
-        Client::init(DEFAULT_API_KEY)
+        unsafe {
+            Client::init(DEFAULT_API_KEY)
+        }
     }
 
     fn set_http_client(&mut self, http_client: HttpClient) {
+        let http_client_clone = http_client.clone();
+
         self.c.set_http_client(http_client);
-        self.email_verify.set_http_client(http_client.clone());
+        self.email_verify.set_http_client(http_client_clone);
     }
 
     fn set_base_url(&mut self, base_url_str: &'static str) -> Result<(), Error> {
-        self.c.set_base_url(base_url_str)?;
-        self.email_verify.set_base_url(base_url_str)?;
+        let _ = self.c.set_base_url(base_url_str);
+        let _ = self.email_verify.set_base_url(base_url_str);
         Ok(())
     }
 
@@ -60,7 +68,7 @@ fn set_http_client(http_client: HttpClient) {
         if let Some(ref mut default_client) = DEFAULT_CLIENT {
             default_client.set_http_client(http_client.clone());
         }
-        DEFAULT_HTTP_CLIENT = http_client;
+        *DEFAULT_HTTP_CLIENT = http_client;
     }
 }
 

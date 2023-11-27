@@ -49,7 +49,7 @@ impl EmailVerifyClient {
         opts: Option<&SingleVerifyReqOpts>,
     ) -> Result<SingleVerifyResp, RequestError> {
         let default_opts = SingleVerifyReqOpts {
-            req_opts: ReqOpts::default(),
+            req_opts: self.client.prepare_opts(&ReqOpts::default()),
             disable_url_encode: None,
         };
 

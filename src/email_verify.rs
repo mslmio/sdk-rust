@@ -1,13 +1,14 @@
-use crate::Client;
+use crate::BaseClient;
 use reqwest::blocking::Client as HttpClient;
-use url::form_urlencoded;
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use std::fmt;
 use std::collections::HashMap;
-use crate::ReqOpts;
+use crate::{ReqOpts, RequestError};
+use reqwest;
 
 pub struct EmailVerifyClient {
     // Common client system.
-    pub client: Client,
+    pub client: BaseClient,
 }
 
 pub struct SingleVerifyReqOpts {
@@ -17,7 +18,7 @@ pub struct SingleVerifyReqOpts {
 
 impl EmailVerifyClient {
     pub fn new(api_key: &str) -> Self {
-        let mut client = Client::new();
+        let mut client = BaseClient::new();
         client.set_api_key(api_key);
         Self { client }
     }
@@ -42,19 +43,45 @@ impl EmailVerifyClient {
         self.client.set_api_key(api_key);
     }
 
-    pub fn single_verify(&self, email_addr: &str) -> Result<SingleVerifyResp, reqwest::Error> {
-        let email_addr = form_urlencoded::byte_serialize(email_addr.as_bytes()).collect();
-        let qp: HashMap<&str, String> = [("email", email_addr)].iter().cloned().collect();
+    pub async fn single_verify(
+        &self,
+        email_addr: &str,
+        opts: Option<&SingleVerifyReqOpts>,
+    ) -> Result<SingleVerifyResp, RequestError> {
+        let default_opts = SingleVerifyReqOpts {
+            req_opts: ReqOpts::default(),
+            disable_url_encode: None,
+        };
 
-        let res = self.client.http.get("https://mslm.io/api/sv/v1")
-            .query(&qp)
-            .send()?;
+        let opt = opts.unwrap_or(&default_opts);
 
-        let res = res.error_for_status()?;
+        let email_addr = if let Some(disable_url_encode) = opt.disable_url_encode {
+            if !disable_url_encode {
+                utf8_percent_encode(email_addr, NON_ALPHANUMERIC).to_string()
+            } else {
+                email_addr.to_string()
+            }
+        } else {
+            email_addr.to_string()
+        };
 
-        let sv_resp: SingleVerifyResp = res.json()?;
+        let qp: HashMap<String, String> = [("email".to_string(), email_addr.to_string())]
+            .iter()
+            .cloned()
+            .collect();
 
-        Ok(sv_resp)
+        let t_url_result = self.client.prepare_url("/api/sv/v1", &qp, &opt.req_opts);
+        let t_url = match t_url_result {
+            Ok(url) => url,
+            Err(err) => return Err(err),
+        };
+
+        let res: SingleVerifyResp = self
+            .client
+            .req_and_resp(reqwest::Method::GET, t_url, None, &opt.req_opts)
+            .await?;
+
+        Ok(res)
     }
 }
 

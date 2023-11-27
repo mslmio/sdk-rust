@@ -1,0 +1,8 @@
+[package]
+name = "mslm"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.10.0-alpha.2", features = ["blocking"] }
+url = "2.2.2"

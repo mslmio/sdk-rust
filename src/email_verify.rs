@@ -1,16 +1,10 @@
 use crate::BaseClient;
 use reqwest::blocking::Client as HttpClient;
-<<<<<<< HEAD
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use std::fmt;
 use std::collections::HashMap;
 use crate::{ReqOpts, RequestError};
 use reqwest;
-=======
-use url::form_urlencoded;
-use std::fmt;
-use std::collections::HashMap;
->>>>>>> 0b85bbd (implement sv)
 
 pub struct EmailVerifyClient {
     // Common client system.

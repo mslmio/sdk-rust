@@ -3,6 +3,7 @@ use url::Url;
 use serde::de::DeserializeOwned;
 
 #[derive(Debug)]
+#[derive(Default)]
 pub struct ReqOpts {
     pub http: Option<HttpClient>,
     pub base_url: Option<Url>,
@@ -47,7 +48,7 @@ impl From<serde_json::Error> for RequestError {
     }
 }
 
-pub struct Client {
+pub struct BaseClient {
     // HTTP client used for making requests.
     pub http: HttpClient,
 
@@ -61,7 +62,7 @@ pub struct Client {
     api_key: String,
 }
 
-impl Client {
+impl BaseClient {
 
     pub fn new() -> Self {
         Self {
@@ -154,7 +155,7 @@ impl Client {
 
 }
 
-pub fn init_defaults() -> Client {
-    Client::new()
+pub fn init_defaults() -> BaseClient {
+    BaseClient::new()
 }
 

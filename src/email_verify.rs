@@ -3,10 +3,16 @@ use reqwest::blocking::Client as HttpClient;
 use url::form_urlencoded;
 use std::fmt;
 use std::collections::HashMap;
+use crate::ReqOpts;
 
 pub struct EmailVerifyClient {
     // Common client system.
     pub client: Client,
+}
+
+pub struct SingleVerifyReqOpts {
+    pub req_opts: ReqOpts,
+    pub disable_url_encode: Option<bool>,
 }
 
 impl EmailVerifyClient {

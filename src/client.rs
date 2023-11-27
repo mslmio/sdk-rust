@@ -53,7 +53,7 @@ pub struct BaseClient {
     pub http: HttpClient,
 
     // Base URL for API requests.
-    base_url: Url,
+    pub base_url: Url,
 
     // User-agent used when communicating with the API.
     user_agent: String,

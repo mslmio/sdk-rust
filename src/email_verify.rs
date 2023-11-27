@@ -49,7 +49,7 @@ impl EmailVerifyClient {
         opts: Option<&SingleVerifyReqOpts>,
     ) -> Result<SingleVerifyResp, RequestError> {
         let default_opts = SingleVerifyReqOpts {
-            req_opts: ReqOpts::default(),
+            req_opts: self.client.prepare_opts(&ReqOpts::default()),
             disable_url_encode: None,
         };
 
@@ -70,7 +70,7 @@ impl EmailVerifyClient {
             .cloned()
             .collect();
 
-        let t_url_result = self.client.prepare_url("/api/sv/v1", &qp, &opt.req_opts);
+        let t_url_result = self.client.prepare_url("api/sv/v1", &qp, &opt.req_opts);
         let t_url = match t_url_result {
             Ok(url) => url,
             Err(err) => return Err(err),

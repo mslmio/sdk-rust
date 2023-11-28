@@ -38,6 +38,44 @@ pub struct OtpSendReqOpts {
     pub req_opts: ReqOpts,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OtpTokenVerifyResp {
+    code: i64,
+    msg: String,
+}
+
+impl fmt::Display for OtpTokenVerifyResp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            r#"{{"code":"{}","msg":"{}" }}"#,
+            self.code, self.msg
+        )
+    }
+}
+
+pub struct OtpTokenVerifyReqOpts {
+    // Common request options.
+    pub req_opts: ReqOpts,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OtpTokenVerifyReq {
+    pub phone: String,
+    pub token: String,
+    pub consume: Option<bool>,
+}
+
+impl fmt::Display for OtpTokenVerifyReq {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            r#"{{"phone":"{}","token":"{}","consume":"{}" }}"#,
+            self.phone, self.token, self.consume.unwrap_or_default()
+        )
+    }
+}
+
 pub struct OtpClient {
     pub client: BaseClient,
 }
@@ -96,4 +134,33 @@ impl OtpClient {
 
         Ok(resp)
     }
+
+    pub async fn verify(
+        &self,
+        otp_token_verify_req: &OtpTokenVerifyReq,
+        opts: Option<&OtpTokenVerifyReqOpts>,
+    ) -> Result<OtpTokenVerifyResp, RequestError> {
+        // Prepare options.
+        let default_opts = OtpTokenVerifyReqOpts {
+            req_opts: self.client.prepare_opts(&ReqOpts::default()),
+        };
+
+        let opt = opts.unwrap_or(&default_opts);
+
+        // Prepare URL.
+        let qp: HashMap<String, String> = HashMap::new();
+        let t_url = self.client.prepare_url("api/otp/v1/token_verify", &qp, &opt.req_opts)?;
+
+        // Serialize.
+        let data = serde_json::to_vec(otp_token_verify_req)?;
+
+        // Get data.
+        let resp: OtpTokenVerifyResp = self
+            .client
+            .req_and_resp(reqwest::Method::POST, t_url, Some(data), &opt.req_opts)
+            .await?;
+
+        Ok(resp)
+    }
+
 }

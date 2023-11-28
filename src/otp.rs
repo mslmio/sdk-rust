@@ -1,13 +1,10 @@
-use crate::BaseClient;
+use crate::{BaseClient, ReqOpts, RequestError};
 use reqwest::blocking::Client as HttpClient;
-use crate::{ReqOpts, RequestError};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
 
-pub struct OtpSendReqOpts  {
-    pub req_opts: ReqOpts,
-}
-#[derive(serde::Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct OtpSendResp {
     code: i64,
     msg: String,
@@ -19,19 +16,26 @@ impl fmt::Display for OtpSendResp {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(Serialize)]
 pub struct OtpSendReq {
     pub phone: String,
     pub tmpl_sms: String,
     pub token_len: i32,
-    pub expire_seconds: i32,    
+    pub expire_seconds: i32,
 }
 
 impl fmt::Display for OtpSendReq {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, r#"{{"phone":"{}","tmpl_sms":"{}","token_len":"{}","tmpl_sms":"{}","expire_seconds":"{}" }}"#, 
-        self.phone, self.tmpl_sms, self.token_len, self.tmpl_sms, self.expire_seconds)
+        write!(
+            f,
+            r#"{{"phone":"{}","tmpl_sms":"{}","token_len":"{}","tmpl_sms":"{}","expire_seconds":"{}" }}"#,
+            self.phone, self.tmpl_sms, self.token_len, self.tmpl_sms, self.expire_seconds
+        )
     }
+}
+
+pub struct OtpSendReqOpts {
+    pub req_opts: ReqOpts,
 }
 
 pub struct OtpClient {
@@ -79,12 +83,7 @@ impl OtpClient {
 
         // Prepare URL.
         let qp: HashMap<String, String> = HashMap::new();
-
-        let t_url_result = self.client.prepare_url("api/otp/v1/send", &qp, &opt.req_opts);
-        let t_url = match t_url_result {
-            Ok(url) => url,
-            Err(err) => return Err(err),
-        };
+        let t_url = self.client.prepare_url("api/otp/v1/send", &qp, &opt.req_opts)?;
 
         // Serialize.
         let data = serde_json::to_vec(otp_send_req)?;

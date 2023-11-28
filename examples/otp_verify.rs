@@ -12,6 +12,7 @@ async fn main() {
     };
 
     let res = c.otp.verify(&otp_token_verify_req, None).await;
+
     match res {
         Ok(response) => {
             println!("Response:\n{}", response);

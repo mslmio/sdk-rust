@@ -1,9 +1,10 @@
-use reqwest::blocking::Client as HttpClient;
-use reqwest::Error;
 use crate::{BaseClient, EmailVerifyClient, OtpClient};
 use once_cell::sync::Lazy;
+use reqwest::blocking::Client as HttpClient;
+use reqwest::Error;
 
-static mut DEFAULT_HTTP_CLIENT: Lazy<HttpClient> = Lazy::new(|| HttpClient::new());
+static mut DEFAULT_HTTP_CLIENT: Lazy<HttpClient> =
+    Lazy::new(|| HttpClient::new());
 static mut DEFAULT_CLIENT: Option<Client> = None;
 static mut DEFAULT_BASE_URL: &'static str = "https://mslm.io";
 static mut DEFAULT_USER_AGENT: &'static str = "mslm/rust/1.0.0";
@@ -37,9 +38,7 @@ impl Client {
     }
 
     pub fn init_defaults() -> Self {
-        unsafe {
-            Client::init(DEFAULT_API_KEY)
-        }
+        unsafe { Client::init(DEFAULT_API_KEY) }
     }
 
     pub fn set_http_client(&mut self, http_client: HttpClient) {
@@ -48,7 +47,10 @@ impl Client {
         self.otp.set_http_client(http_client);
     }
 
-    pub fn set_base_url(&mut self, base_url_str: &'static str) -> Result<(), Error> {
+    pub fn set_base_url(
+        &mut self,
+        base_url_str: &'static str,
+    ) -> Result<(), Error> {
         let _ = self.c.set_base_url(base_url_str);
         let _ = self.email_verify.set_base_url(base_url_str);
         let _ = self.otp.set_base_url(base_url_str);

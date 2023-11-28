@@ -1,10 +1,10 @@
 use crate::BaseClient;
-use reqwest::blocking::Client as HttpClient;
-use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use std::fmt;
-use std::collections::HashMap;
 use crate::{ReqOpts, RequestError};
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest;
+use reqwest::blocking::Client as HttpClient;
+use std::collections::HashMap;
+use std::fmt;
 
 pub struct EmailVerifyClient {
     // Common client system.
@@ -31,7 +31,10 @@ impl EmailVerifyClient {
         self.client.set_http_client(http_client);
     }
 
-    pub fn set_base_url(&mut self, base_url_str: &str) -> Result<(), url::ParseError> {
+    pub fn set_base_url(
+        &mut self,
+        base_url_str: &str,
+    ) -> Result<(), url::ParseError> {
         self.client.set_base_url(base_url_str)
     }
 
@@ -55,7 +58,9 @@ impl EmailVerifyClient {
 
         let opt = opts.unwrap_or(&default_opts);
 
-        let email_addr = if let Some(disable_url_encode) = opt.disable_url_encode {
+        let email_addr = if let Some(disable_url_encode) =
+            opt.disable_url_encode
+        {
             if !disable_url_encode {
                 utf8_percent_encode(email_addr, NON_ALPHANUMERIC).to_string()
             } else {
@@ -65,12 +70,14 @@ impl EmailVerifyClient {
             email_addr.to_string()
         };
 
-        let qp: HashMap<String, String> = [("email".to_string(), email_addr.to_string())]
-            .iter()
-            .cloned()
-            .collect();
+        let qp: HashMap<String, String> =
+            [("email".to_string(), email_addr.to_string())]
+                .iter()
+                .cloned()
+                .collect();
 
-        let t_url_result = self.client.prepare_url("api/sv/v1", &qp, &opt.req_opts);
+        let t_url_result =
+            self.client.prepare_url("api/sv/v1", &qp, &opt.req_opts);
         let t_url = match t_url_result {
             Ok(url) => url,
             Err(err) => return Err(err),
@@ -115,8 +122,25 @@ impl fmt::Display for SingleVerifyRespMx {
 
 impl fmt::Display for SingleVerifyResp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, r#"{{"email":"{}","username":"{}","domain":"{}","malformed":{},"suggestion":"{}","status":"{}","has_mailbox":{},"accept_all":{},"disposable":{},"free":{},"role":{},"mx":[{}]}}"#,
-               self.email, self.username, self.domain, self.malformed, self.suggestion, self.status, self.has_mailbox, self.accept_all, self.disposable, self.free, self.role,
-               self.mx.iter().map(|mx| mx.to_string()).collect::<Vec<String>>().join(","))
+        write!(
+            f,
+            r#"{{"email":"{}","username":"{}","domain":"{}","malformed":{},"suggestion":"{}","status":"{}","has_mailbox":{},"accept_all":{},"disposable":{},"free":{},"role":{},"mx":[{}]}}"#,
+            self.email,
+            self.username,
+            self.domain,
+            self.malformed,
+            self.suggestion,
+            self.status,
+            self.has_mailbox,
+            self.accept_all,
+            self.disposable,
+            self.free,
+            self.role,
+            self.mx
+                .iter()
+                .map(|mx| mx.to_string())
+                .collect::<Vec<String>>()
+                .join(",")
+        )
     }
 }

@@ -46,11 +46,7 @@ pub struct OtpTokenVerifyResp {
 
 impl fmt::Display for OtpTokenVerifyResp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            r#"{{"code":"{}","msg":"{}" }}"#,
-            self.code, self.msg
-        )
+        write!(f, r#"{{"code":"{}","msg":"{}" }}"#, self.code, self.msg)
     }
 }
 
@@ -71,7 +67,9 @@ impl fmt::Display for OtpTokenVerifyReq {
         write!(
             f,
             r#"{{"phone":"{}","token":"{}","consume":"{}" }}"#,
-            self.phone, self.token, self.consume.unwrap_or_default()
+            self.phone,
+            self.token,
+            self.consume.unwrap_or_default()
         )
     }
 }
@@ -95,7 +93,10 @@ impl OtpClient {
         self.client.set_http_client(http_client);
     }
 
-    pub fn set_base_url(&mut self, base_url_str: &str) -> Result<(), url::ParseError> {
+    pub fn set_base_url(
+        &mut self,
+        base_url_str: &str,
+    ) -> Result<(), url::ParseError> {
         self.client.set_base_url(base_url_str)
     }
 
@@ -121,7 +122,9 @@ impl OtpClient {
 
         // Prepare URL.
         let qp: HashMap<String, String> = HashMap::new();
-        let t_url = self.client.prepare_url("api/otp/v1/send", &qp, &opt.req_opts)?;
+        let t_url =
+            self.client
+                .prepare_url("api/otp/v1/send", &qp, &opt.req_opts)?;
 
         // Serialize.
         let data = serde_json::to_vec(otp_send_req)?;
@@ -129,7 +132,12 @@ impl OtpClient {
         // Get data.
         let resp = self
             .client
-            .req_and_resp(reqwest::Method::POST, t_url, Some(data), &opt.req_opts)
+            .req_and_resp(
+                reqwest::Method::POST,
+                t_url,
+                Some(data),
+                &opt.req_opts,
+            )
             .await?;
 
         Ok(resp)
@@ -149,7 +157,11 @@ impl OtpClient {
 
         // Prepare URL.
         let qp: HashMap<String, String> = HashMap::new();
-        let t_url = self.client.prepare_url("api/otp/v1/token_verify", &qp, &opt.req_opts)?;
+        let t_url = self.client.prepare_url(
+            "api/otp/v1/token_verify",
+            &qp,
+            &opt.req_opts,
+        )?;
 
         // Serialize.
         let data = serde_json::to_vec(otp_token_verify_req)?;
@@ -157,10 +169,14 @@ impl OtpClient {
         // Get data.
         let resp: OtpTokenVerifyResp = self
             .client
-            .req_and_resp(reqwest::Method::POST, t_url, Some(data), &opt.req_opts)
+            .req_and_resp(
+                reqwest::Method::POST,
+                t_url,
+                Some(data),
+                &opt.req_opts,
+            )
             .await?;
 
         Ok(resp)
     }
-
 }

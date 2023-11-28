@@ -1,9 +1,8 @@
 use reqwest::blocking::Client as HttpClient;
-use url::Url;
 use serde::de::DeserializeOwned;
+use url::Url;
 
-#[derive(Debug)]
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct ReqOpts {
     pub http: Option<HttpClient>,
     pub base_url: Option<Url>,
@@ -63,11 +62,11 @@ pub struct BaseClient {
 }
 
 impl BaseClient {
-
     pub fn new() -> Self {
         Self {
             http: HttpClient::new(),
-            base_url: Url::parse("https://mslm.io").expect("Failed to parse default base URL"),
+            base_url: Url::parse("https://mslm.io")
+                .expect("Failed to parse default base URL"),
             user_agent: String::from("mslm/rust/1.0.0"),
             api_key: String::new(),
         }
@@ -77,7 +76,10 @@ impl BaseClient {
         self.http = http_client;
     }
 
-    pub fn set_base_url(&mut self, base_url_str: &str) -> Result<(), url::ParseError> {
+    pub fn set_base_url(
+        &mut self,
+        base_url_str: &str,
+    ) -> Result<(), url::ParseError> {
         let base_url = Url::parse(base_url_str)?;
         self.base_url = base_url;
         Ok(())
@@ -93,12 +95,16 @@ impl BaseClient {
 
     pub fn prepare_opts(&self, opt: &ReqOpts) -> ReqOpts {
         let http_c = opt.http.clone().unwrap_or_else(|| self.http.clone());
-        let base_url = opt.base_url.clone().unwrap_or_else(|| self.base_url.clone());
+        let base_url = opt
+            .base_url
+            .clone()
+            .unwrap_or_else(|| self.base_url.clone());
         let user_agent = opt
             .user_agent
             .clone()
             .unwrap_or_else(|| self.user_agent.clone());
-        let api_key = opt.api_key.clone().unwrap_or_else(|| self.api_key.clone());
+        let api_key =
+            opt.api_key.clone().unwrap_or_else(|| self.api_key.clone());
 
         ReqOpts {
             http: Some(http_c),
@@ -124,7 +130,9 @@ impl BaseClient {
             t_url.query_pairs_mut().append_pair(k, v);
         }
 
-        t_url.query_pairs_mut().append_pair("apikey", opt.api_key.as_deref().unwrap_or_default());
+        t_url
+            .query_pairs_mut()
+            .append_pair("apikey", opt.api_key.as_deref().unwrap_or_default());
 
         Ok(t_url)
     }
@@ -137,12 +145,16 @@ impl BaseClient {
         opt: &ReqOpts,
     ) -> Result<T, RequestError> {
         let cloned_data = data.clone().unwrap_or_default();
-        let body_data: &'static [u8] = Box::leak(cloned_data.into_boxed_slice());
+        let body_data: &'static [u8] =
+            Box::leak(cloned_data.into_boxed_slice());
 
         let request = self
             .http
             .request(method, t_url.as_str())
-            .header(reqwest::header::USER_AGENT, opt.user_agent.as_deref().unwrap_or_default())
+            .header(
+                reqwest::header::USER_AGENT,
+                opt.user_agent.as_deref().unwrap_or_default(),
+            )
             .body::<&[u8]>(body_data);
 
         let resp = request.send()?;
@@ -152,10 +164,8 @@ impl BaseClient {
 
         Ok(resp_data)
     }
-
 }
 
 pub fn init_defaults() -> BaseClient {
     BaseClient::new()
 }
-

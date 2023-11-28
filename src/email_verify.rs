@@ -70,11 +70,8 @@ impl EmailVerifyClient {
             email_addr.to_string()
         };
 
-        let qp: HashMap<String, String> =
-            [("email".to_string(), email_addr.to_string())]
-                .iter()
-                .cloned()
-                .collect();
+        let mut qp: HashMap<String, String> = HashMap::new();
+        qp.insert("email".to_string(), email_addr);
 
         let t_url_result =
             self.client.prepare_url("api/sv/v1", &qp, &opt.req_opts);

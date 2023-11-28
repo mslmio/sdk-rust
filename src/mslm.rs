@@ -1,6 +1,6 @@
 use reqwest::blocking::Client as HttpClient;
 use reqwest::Error;
-use crate::{BaseClient, EmailVerifyClient};
+use crate::{BaseClient, EmailVerifyClient, OtpClient};
 use once_cell::sync::Lazy;
 
 static mut DEFAULT_HTTP_CLIENT: Lazy<HttpClient> = Lazy::new(|| HttpClient::new());
@@ -15,6 +15,9 @@ pub struct Client {
 
     // The Email Verify API client.
     pub email_verify: EmailVerifyClient,
+
+    // The OTP client.
+    pub otp: OtpClient,
 }
 
 impl Client {
@@ -22,6 +25,7 @@ impl Client {
         let mut client = Client {
             c: BaseClient::new(),
             email_verify: EmailVerifyClient::new(api_key),
+            otp: OtpClient::new(api_key),
         };
         client.set_http_client(HttpClient::new());
         unsafe {
@@ -39,26 +43,28 @@ impl Client {
     }
 
     pub fn set_http_client(&mut self, http_client: HttpClient) {
-        let http_client_clone = http_client.clone();
-
-        self.c.set_http_client(http_client);
-        self.email_verify.set_http_client(http_client_clone);
+        self.c.set_http_client(http_client.clone());
+        self.email_verify.set_http_client(http_client.clone());
+        self.otp.set_http_client(http_client);
     }
 
     pub fn set_base_url(&mut self, base_url_str: &'static str) -> Result<(), Error> {
         let _ = self.c.set_base_url(base_url_str);
         let _ = self.email_verify.set_base_url(base_url_str);
+        let _ = self.otp.set_base_url(base_url_str);
         Ok(())
     }
 
     pub fn set_user_agent(&mut self, user_agent: &'static str) {
         self.c.set_user_agent(user_agent);
         self.email_verify.set_user_agent(user_agent);
+        self.otp.set_user_agent(user_agent);
     }
 
     pub fn set_api_key(&mut self, api_key: &'static str) {
         self.c.set_api_key(api_key);
         self.email_verify.set_api_key(api_key);
+        self.otp.set_api_key(api_key);
     }
 }
 

@@ -28,8 +28,8 @@ impl fmt::Display for OtpSendReq {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"{{"phone":"{}","tmpl_sms":"{}","token_len":"{}","tmpl_sms":"{}","expire_seconds":"{}" }}"#,
-            self.phone, self.tmpl_sms, self.token_len, self.tmpl_sms, self.expire_seconds
+            r#"{{"phone":"{}","tmpl_sms":"{}","token_len":"{}","expire_seconds":"{}" }}"#,
+            self.phone, self.tmpl_sms, self.token_len, self.expire_seconds
         )
     }
 }

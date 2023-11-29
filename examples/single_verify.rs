@@ -7,11 +7,11 @@ async fn main() {
 
     match res {
         Ok(response) => {
-            println!("Response:\n{}", response);
+            println!("Response:\n{:#?}", response);
         }
 
         Err(err) => {
-            eprintln!("Error verifying email: {}", err);
+            eprintln!("Error verifying email: {:#?}", err);
         }
     }
 }

@@ -4,7 +4,7 @@ use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest;
 use reqwest::blocking::Client as HttpClient;
 use std::collections::HashMap;
-use std::fmt;
+use serde::{Deserialize, Serialize};
 
 pub struct EmailVerifyClient {
     // Common client system.
@@ -89,13 +89,15 @@ impl EmailVerifyClient {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
+
 struct SingleVerifyRespMx {
     host: String,
     pref: i32,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
+
 pub struct SingleVerifyResp {
     email: String,
     username: String,

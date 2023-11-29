@@ -3,13 +3,13 @@ use reqwest::blocking::Client as HttpClient;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct OtpSendResp {
     code: i64,
     msg: String,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct OtpSendReq {
     pub phone: String,
     pub tmpl_sms: String,
@@ -21,7 +21,7 @@ pub struct OtpSendReqOpts {
     pub req_opts: ReqOpts,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct OtpTokenVerifyResp {
     code: i64,
     msg: String,
@@ -32,7 +32,7 @@ pub struct OtpTokenVerifyReqOpts {
     pub req_opts: ReqOpts,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone)]
 pub struct OtpTokenVerifyReq {
     pub phone: String,
     pub token: String,

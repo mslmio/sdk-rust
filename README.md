@@ -24,11 +24,44 @@ async fn main() {
 
     match res {
         Ok(response) => {
-            println!("Response:\n{}", response);
+            println!("Response:\n{:#?}", response);
         }
 
         Err(err) => {
-            eprintln!("Error verifying email: {}", err);
+            eprintln!("Error verifying email: {:#?}", err);
+        }
+    }
+}
+```
+
+Sub-client can be initiated directly too:
+
+```
+use mslm::Client;
+use mslm::otp::OtpSendReq;
+
+#[tokio::main]
+async fn main() {
+    let c = Client::init("");
+    let mut otp = c.otp;
+    otp.set_api_key("YOUR_OTP_API_KEY");
+
+    let otp_send_req = OtpSendReq {
+        phone: String::from("<>"),
+        tmpl_sms: String::from("<>"),
+        token_len: 6,
+        expire_seconds: 60,
+    };
+
+    let res = otp.send(&otp_send_req, None).await;
+
+    match res {
+        Ok(response) => {
+            println!("Response:\n{:#?}", response);
+        }
+
+        Err(err) => {
+            eprintln!("Error: {:#?}", err);
         }
     }
 }

@@ -111,33 +111,3 @@ pub struct SingleVerifyResp {
     mx: Vec<SingleVerifyRespMx>,
 }
 
-impl fmt::Display for SingleVerifyRespMx {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, r#"{{"host":"{}","pref":{}}}"#, self.host, self.pref)
-    }
-}
-
-impl fmt::Display for SingleVerifyResp {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            r#"{{"email":"{}","username":"{}","domain":"{}","malformed":{},"suggestion":"{}","status":"{}","has_mailbox":{},"accept_all":{},"disposable":{},"free":{},"role":{},"mx":[{}]}}"#,
-            self.email,
-            self.username,
-            self.domain,
-            self.malformed,
-            self.suggestion,
-            self.status,
-            self.has_mailbox,
-            self.accept_all,
-            self.disposable,
-            self.free,
-            self.role,
-            self.mx
-                .iter()
-                .map(|mx| mx.to_string())
-                .collect::<Vec<String>>()
-                .join(",")
-        )
-    }
-}

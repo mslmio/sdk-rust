@@ -2,18 +2,11 @@ use crate::{BaseClient, ReqOpts, RequestError};
 use reqwest::blocking::Client as HttpClient;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fmt;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OtpSendResp {
     code: i64,
     msg: String,
-}
-
-impl fmt::Display for OtpSendResp {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, r#"{{"code":"{}","msg":"{}"}}"#, self.code, self.msg)
-    }
 }
 
 #[derive(Serialize)]
@@ -22,16 +15,6 @@ pub struct OtpSendReq {
     pub tmpl_sms: String,
     pub token_len: i32,
     pub expire_seconds: i32,
-}
-
-impl fmt::Display for OtpSendReq {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            r#"{{"phone":"{}","tmpl_sms":"{}","token_len":"{}","expire_seconds":"{}" }}"#,
-            self.phone, self.tmpl_sms, self.token_len, self.expire_seconds
-        )
-    }
 }
 
 pub struct OtpSendReqOpts {
@@ -44,12 +27,6 @@ pub struct OtpTokenVerifyResp {
     msg: String,
 }
 
-impl fmt::Display for OtpTokenVerifyResp {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, r#"{{"code":"{}","msg":"{}" }}"#, self.code, self.msg)
-    }
-}
-
 pub struct OtpTokenVerifyReqOpts {
     // Common request options.
     pub req_opts: ReqOpts,
@@ -60,18 +37,6 @@ pub struct OtpTokenVerifyReq {
     pub phone: String,
     pub token: String,
     pub consume: Option<bool>,
-}
-
-impl fmt::Display for OtpTokenVerifyReq {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            r#"{{"phone":"{}","token":"{}","consume":"{}" }}"#,
-            self.phone,
-            self.token,
-            self.consume.unwrap_or_default()
-        )
-    }
 }
 
 pub struct OtpClient {

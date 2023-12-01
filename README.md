@@ -36,7 +36,7 @@ async fn main() {
 
 Sub-client can be initiated directly too:
 
-```
+```rust
 use mslm::Client;
 use mslm::otp::OtpSendReq;
 

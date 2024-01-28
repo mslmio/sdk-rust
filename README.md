@@ -12,6 +12,7 @@ mslm = "1.0.0"
 ```
 
 Reference the `mslm` crate in your program and write some code.
+
 Make sure to initialize the Client with your API key and handle the result accordingly.
 
 ```rust
@@ -34,7 +35,7 @@ async fn main() {
 }
 ```
 
-Sub-client can be initiated directly too:
+Subclienst can be initiated directly:
 
 ```rust
 use mslm::Client;

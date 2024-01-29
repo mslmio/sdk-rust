@@ -2,6 +2,14 @@
 
 The official Rust SDK for Mslm APIs.
 
+## Requirements
+
+Install Rust and Cargo by following [these instructions](https://doc.rust-lang.org/book/ch01-01-installation.html).
+
+## Authentication
+
+Mslm's APIs require an API key. If you don't have one, please read [Authentication](https://mslm.io/docs/api/authentication) to understand how to get an API key before continuing.
+
 ## Usage
 
 Add the following to your Cargo.toml file:
